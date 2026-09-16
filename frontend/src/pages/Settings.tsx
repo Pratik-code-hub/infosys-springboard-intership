@@ -125,7 +125,7 @@ export default function Settings() {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="p-4 bg-slate-950/60 border border-slate-800 rounded-2xl">
                 <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block mb-1">Platform Architect</span>
-                <span className="text-sm font-bold text-white">Pratik</span>
+                <span className="text-sm font-bold text-white">Pratik Kumar</span>
                 <span className="text-[10px] text-cyan-400 block mt-0.5">Core Engineering</span>
               </div>
 
@@ -145,7 +145,7 @@ export default function Settings() {
             <div className="mt-4 p-4 bg-slate-950/40 border border-slate-800/80 rounded-2xl flex items-center justify-between text-xs">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span className="text-slate-300">Software License: Official MIT License granted to <strong className="text-white">Pratik (2026)</strong></span>
+                <span className="text-slate-300">Software License: Official MIT License granted to <strong className="text-white">Pratik Kumar (2026)</strong></span>
               </div>
               <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/10 text-cyan-400 font-mono border border-cyan-500/20">Release v2.0.0</span>
             </div>

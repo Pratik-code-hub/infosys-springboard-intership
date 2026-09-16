@@ -10,7 +10,7 @@ key: str = os.environ.get("SUPABASE_KEY", "")
 supabase: Client = create_client(url, key)
 
 users_to_create = [
-    {"email": "pratik.admin@arogyapulse.ai", "password": "Password@123", "role": "admin", "name": "Pratik Sharma (System Director)"},
+    {"email": "pratik.admin@arogyapulse.ai", "password": "Password@123", "role": "admin", "name": "Pratik Kumar (System Director)"},
     {"email": "dr.ananya@arogyapulse.ai", "password": "Password@123", "role": "doctor", "name": "Dr. Ananya Iyer (Cardiology)"},
     {"email": "dr.rajesh@arogyapulse.ai", "password": "Password@123", "role": "doctor", "name": "Dr. Rajesh Mehta (General Medicine)"},
     {"email": "aarav.verma@gmail.com", "password": "Password@123", "role": "patient", "name": "Aarav Verma (Patient)"},

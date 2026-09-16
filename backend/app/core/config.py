@@ -3,7 +3,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "ArogyaPulse AI Engine"
-    AUTHOR: str = "Pratik"
+    AUTHOR: str = "Pratik Kumar"
     VERSION: str = "2.0.0"
     API_V1_STR: str = "/api/v1"
     

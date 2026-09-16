@@ -197,7 +197,7 @@ export default function DoctorDashboard() {
     
     doc.setTextColor(15, 23, 42);
     doc.setFontSize(11);
-    doc.text(`Engineered by: Pratik | System Version: 2.0.0`, 10, 35);
+    doc.text(`Engineered by: Pratik Kumar | System Version: 2.0.0`, 10, 35);
     doc.text(`Patient Name: ${patient.name}`, 10, 43);
     doc.text(`Assigned Urgency: ${patient.urgency}`, 10, 51);
     doc.text(`Recommended Department: ${patient.dept}`, 10, 59);
@@ -212,7 +212,7 @@ export default function DoctorDashboard() {
 
     doc.setFontSize(8);
     doc.setTextColor(100, 116, 139);
-    doc.text('ArogyaPulse Healthcare Platform by Pratik. Clinical decision support note.', 10, 280);
+    doc.text('ArogyaPulse Healthcare Platform by Pratik Kumar. Clinical decision support note.', 10, 280);
     
     doc.save(`ArogyaPulse_DoctorTriage_${patient.name.replace(/\s+/g, '_')}.pdf`);
   };
@@ -220,7 +220,7 @@ export default function DoctorDashboard() {
   const downloadExcel = (patient: any) => {
     const worksheet = XLSX.utils.json_to_sheet([{
       System: "ArogyaPulse AI",
-      Author: "Pratik",
+      Author: "Pratik Kumar",
       Patient: patient.name,
       Urgency: patient.urgency,
       Department: patient.dept,

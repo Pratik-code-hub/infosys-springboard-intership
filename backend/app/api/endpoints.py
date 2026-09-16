@@ -88,7 +88,7 @@ async def chat_interaction(request: ChatRequest):
         llm = ChatGroq(api_key=settings.GROQ_API_KEY, model_name="openai/gpt-oss-120b")
         
         system_prompt = (
-            "You are ArogyaPulse AI, an advanced clinical-grade medical assistant engineered by Pratik. "
+            "You are ArogyaPulse AI, an advanced clinical-grade medical assistant engineered by Pratik Kumar. "
             "Your role is to conduct a professional, empathetic patient intake interview to assess symptoms before generating an official triage report. "
             "PROFESSIONAL RULES:\n"
             "- Always be warm, clear, and reassuring. Never use alarming language unnecessarily.\n"
@@ -106,7 +106,7 @@ async def chat_interaction(request: ChatRequest):
                 patient_name = user_res.data[0].get("full_name", "Patient")
                 first_name = patient_name.split()[0] if patient_name else "there"
                 system_prompt = (
-                    f"You are ArogyaPulse AI, an advanced clinical-grade medical assistant engineered by Pratik. "
+                    f"You are ArogyaPulse AI, an advanced clinical-grade medical assistant engineered by Pratik Kumar. "
                     f"You are currently conducting a symptom intake interview with {patient_name}. "
                     f"You have full access to this patient's conversation history and can recall what they have previously shared.\n\n"
                     f"PROFESSIONAL RULES:\n"
