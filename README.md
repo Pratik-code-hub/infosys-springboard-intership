@@ -1,6 +1,6 @@
 # ArogyaPulse AI 🏥⚡
 > **Next-Generation Multi-Agent Clinical Intelligence & Healthcare Orchestration Platform**  
-> *Engineered by **Pratik** | Production-Grade Healthcare OS*
+> *Engineered by **Pratik Kumar** | Production-Grade Healthcare OS*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Framework](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
@@ -184,11 +184,11 @@ Frontend will be accessible at `http://localhost:5173`.
 ## 📄 License
 
 This software is released under the **MIT License**.  
-Copyright (c) 2026 **Pratik**. All rights reserved. See [LICENSE](LICENSE) for full legal text.
+Copyright (c) 2026 **Pratik Kumar**. All rights reserved. See [LICENSE](LICENSE) for full legal text.
 
 ---
 
 ## 👨‍💻 Author & Attribution
 
-**Engineered and maintained by Pratik.**  
+**Engineered and maintained by Pratik Kumar.**  
 Designed as a production-grade multi-agent medical triage platform. Contributions and issues are welcome via GitHub Pull Requests.

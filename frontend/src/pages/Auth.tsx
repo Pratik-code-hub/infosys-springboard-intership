@@ -237,7 +237,7 @@ export default function Auth() {
               className="px-2 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 text-[11px] font-medium text-slate-300 hover:text-white border border-slate-700/50 hover:border-indigo-500/50 transition-all flex flex-col items-center gap-0.5"
             >
               <span className="font-semibold text-indigo-400">Director</span>
-              <span className="text-[9px] text-slate-400 truncate max-w-full">Pratik Sharma</span>
+              <span className="text-[9px] text-slate-400 truncate max-w-full">Pratik Kumar</span>
             </button>
           </div>
         </div>
@@ -401,7 +401,7 @@ export default function Auth() {
         {/* Portal Switcher Footer */}
         <div className="mt-8 pt-5 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400">
           <span>ArogyaPulse AI Platform</span>
-          <span className="font-semibold text-cyan-400">Engineered by Pratik</span>
+          <span className="font-semibold text-cyan-400">Engineered by Pratik Kumar</span>
         </div>
 
       </div>

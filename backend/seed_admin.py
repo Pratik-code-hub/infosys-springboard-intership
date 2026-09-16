@@ -21,7 +21,7 @@ async def main():
             sb.table("users").upsert({
                 "id": user_id,
                 "role": "admin",
-                "full_name": "Pratik Sharma (System Director)"
+                "full_name": "Pratik Kumar (System Director)"
             }).execute()
             print("Superadmin user seeded successfully!")
         else:
@@ -34,7 +34,7 @@ async def main():
                 sb.table("users").upsert({
                     "id": user_id,
                     "role": "admin",
-                    "full_name": "Pratik Sharma (System Director)"
+                    "full_name": "Pratik Kumar (System Director)"
                 }).execute()
                 print("Superadmin user role updated successfully!")
             except Exception as e:

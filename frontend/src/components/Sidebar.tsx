@@ -250,7 +250,7 @@ export default function Sidebar({ isOpen = false, setIsOpen = (_v: boolean) => {
 
           <div className="flex items-center justify-between px-1 text-[10px] text-slate-400">
             <span>ArogyaPulse Platform</span>
-            <span className="font-semibold text-slate-400">by Pratik</span>
+            <span className="font-semibold text-slate-400">by Pratik Kumar</span>
           </div>
         </div>
       </aside>
