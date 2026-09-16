@@ -167,13 +167,13 @@ Launch the development server:
 ```bash
 npm run dev
 ```
-Frontend will be accessible at `http://localhost:5173`.
+Frontend will be accessible at `http://localhost:2004`.
 
 ---
 
 ## 🧪 Quick Test-Drive Guide
 
-1. Open `http://localhost:5173/auth`.
+1. Open `http://localhost:2004/auth`.
 2. Click **"Patient (Aarav Verma)"** on the 1-Click Demo Profiles bar, then click **Access System**.
 3. Go to **Symptom Intake AI**, click one of the quick symptom prompts (e.g. *"High fever (102°F) with body chills for 3 days"*), and press Send.
 4. Click **"Generate Multi-Agent Clinical Triage Report"**. Watch the LangGraph stepper orchestrate all 5 agents in real time.
