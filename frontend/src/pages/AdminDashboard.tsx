@@ -48,25 +48,43 @@ export default function AdminDashboard() {
   }, []);
 
   const checkSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    let isAdmin = false;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const { data: userData } = await supabase
+          .from('users')
+          .select('role, full_name')
+          .eq('id', session.user.id)
+          .single();
+
+        if (userData?.role === 'admin') {
+          isAdmin = true;
+          if (userData?.full_name) {
+            setAdminName(userData.full_name.replace(/Hospital Admin \((.*?)\)/i, '$1').replace(/\s*\(Admin\)/i, ''));
+          }
+        }
+      }
+    } catch (e) {
+      console.warn("Admin session check fallback", e);
+    }
+
+    if (!isAdmin) {
+      const demoRaw = localStorage.getItem('arogya_demo_user');
+      if (demoRaw) {
+        try {
+          const demo = JSON.parse(demoRaw);
+          if (demo.role === 'admin') {
+            isAdmin = true;
+            setAdminName(demo.name || 'Pratik Kumar (System Director)');
+          }
+        } catch (err) {}
+      }
+    }
+
+    if (!isAdmin) {
       navigate('/auth');
       return;
-    }
-    
-    const { data: userData } = await supabase
-      .from('users')
-      .select('role, full_name')
-      .eq('id', session.user.id)
-      .single();
-
-    if (userData?.role !== 'admin') {
-      navigate('/dashboard');
-      return;
-    }
-
-    if (userData?.full_name) {
-      setAdminName(userData.full_name.replace(/Hospital Admin \((.*?)\)/i, '$1').replace(/\s*\(Admin\)/i, ''));
     }
 
     fetchAnalytics();
@@ -76,13 +94,13 @@ export default function AdminDashboard() {
     try {
       setLoading(true);
 
-      const [triagesRes, apptsRes, usersRes] = await Promise.all([
+      const [triagesRes, apptsRes, usersRes] = await Promise.allSettled([
         supabase.from('triages').select('department, urgency'),
         supabase.from('appointments').select('id', { count: 'exact' }),
         supabase.from('users').select('id').eq('role', 'doctor')
       ]);
 
-      const triages = triagesRes.data || [];
+      const triages = (triagesRes.status === 'fulfilled' && triagesRes.value.data) ? triagesRes.value.data : [];
       const totalAppointments = apptsRes.count || 0;
       const totalTriages = triages.length;
       const highUrgency = triages.filter(t => t.urgency === 'High' || t.urgency === 'Critical').length;
