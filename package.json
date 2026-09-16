@@ -1,0 +1,10 @@
+{
+  "name": "arogyapulse-ai",
+  "version": "2.0.0",
+  "description": "Next-Generation Multi-Agent Clinical Intelligence & Healthcare Orchestration System",
+  "author": "Pratik",
+  "license": "MIT",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build"
+  }
+}
