@@ -100,11 +100,11 @@ export default function AdminDashboard() {
         supabase.from('users').select('id').eq('role', 'doctor')
       ]);
 
-      const triages = (triagesRes.status === 'fulfilled' && triagesRes.value.data) ? triagesRes.value.data : [];
-      const totalAppointments = apptsRes.count || 0;
+      const triages = (triagesRes.status === 'fulfilled' && (triagesRes.value as any)?.data) ? (triagesRes.value as any).data : [];
+      const totalAppointments = (apptsRes.status === 'fulfilled' && (apptsRes.value as any)?.count) ? (apptsRes.value as any).count : 0;
       const totalTriages = triages.length;
-      const highUrgency = triages.filter(t => t.urgency === 'High' || t.urgency === 'Critical').length;
-      const activeStaff = usersRes.data?.length || 0;
+      const highUrgency = triages.filter((t: any) => t.urgency === 'High' || t.urgency === 'Critical').length;
+      const activeStaff = (usersRes.status === 'fulfilled' && (usersRes.value as any)?.data) ? (usersRes.value as any).data.length : 0;
 
       setStats({
         totalTriages,
@@ -115,7 +115,7 @@ export default function AdminDashboard() {
 
       // Process Department Chart Data
       const deptCounts: Record<string, number> = {};
-      triages.forEach(t => {
+      triages.forEach((t: any) => {
         const dept = t.department || 'General Practice';
         deptCounts[dept] = (deptCounts[dept] || 0) + 1;
       });
@@ -132,7 +132,7 @@ export default function AdminDashboard() {
 
       // Process Urgency Pie Chart Data
       const urgencyCounts = { High: 0, Medium: 0, Low: 0 };
-      triages.forEach(t => {
+      triages.forEach((t: any) => {
         if (t.urgency === 'High' || t.urgency === 'Critical') urgencyCounts.High++;
         else if (t.urgency === 'Medium') urgencyCounts.Medium++;
         else urgencyCounts.Low++;

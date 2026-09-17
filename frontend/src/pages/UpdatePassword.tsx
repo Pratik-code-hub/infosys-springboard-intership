@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Lock, CheckCircle2, KeyRound, AlertCircle, Activity } from 'lucide-react';
+import { Lock, CheckCircle2, KeyRound, AlertCircle } from 'lucide-react';
 
 export default function UpdatePassword() {
   const [password, setPassword] = useState('');

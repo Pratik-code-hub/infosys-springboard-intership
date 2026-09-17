@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { User, Mail, ShieldCheck, Hash, LogOut, Settings as SettingsIcon, Cpu, Activity, Sparkles, CheckCircle2 } from 'lucide-react';
+import { User, LogOut, Settings as SettingsIcon, Cpu, CheckCircle2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Settings() {

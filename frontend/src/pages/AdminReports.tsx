@@ -67,55 +67,119 @@ export default function AdminReports() {
 
   const fetchReports = async () => {
     setLoading(true);
-    const { data: doctorsData } = await supabase
-      .from('users')
-      .select('id, full_name')
-      .eq('role', 'doctor');
+    let doctorsList = [
+      { id: 'doc-ananya', name: 'Dr. Ananya Iyer' },
+      { id: 'doc-rajesh', name: 'Dr. Rajesh Mehta' },
+      { id: 'doc-priya', name: 'Dr. Priya Patel' }
+    ];
 
-    if (doctorsData) {
-      const formattedDocs = doctorsData.map(d => ({
-        id: d.id,
-        name: d.full_name?.replace(/\s*\((Doctor|doctor)\)/gi, '') || 'Doctor'
-      }));
-      setActiveDoctors(formattedDocs);
+    try {
+      const { data: doctorsData } = await supabase
+        .from('users')
+        .select('id, full_name')
+        .eq('role', 'doctor');
+
+      if (doctorsData && doctorsData.length > 0) {
+        doctorsList = doctorsData.map(d => ({
+          id: d.id,
+          name: d.full_name?.replace(/\s*\((Doctor|doctor)\)/gi, '') || 'Doctor'
+        }));
+      }
+    } catch (e) {
+      console.warn("Doctors fetch fallback", e);
+    }
+    setActiveDoctors(doctorsList);
+
+    let onlineReports: any[] = [];
+    try {
+      const { data, error } = await supabase
+        .from('triages')
+        .select(`
+          id,
+          created_at,
+          symptoms,
+          analysis,
+          urgency,
+          department,
+          patient:users!triages_patient_id_fkey(full_name)
+        `)
+        .order('created_at', { ascending: false });
+
+      const { data: apptData } = await supabase
+        .from('appointments')
+        .select('*, users!appointments_doctor_id_fkey(full_name)');
+
+      if (!error && data && data.length > 0) {
+        onlineReports = data.map((triage: any) => {
+          const appt = apptData?.find(a => a.triage_report_id === triage.id);
+          let docName = appt?.users?.full_name || 'Unassigned';
+          docName = docName.replace(/\s*\((Patient|Doctor|Admin|patient|doctor|admin)\)/gi, '');
+          return { ...triage, doctorName: docName };
+        });
+      }
+    } catch (err) {
+      console.warn("Supabase reports fallback", err);
     }
 
-    const { data, error } = await supabase
-      .from('triages')
-      .select(`
-        id,
-        created_at,
-        symptoms,
-        analysis,
-        urgency,
-        department,
-        patient:users!triages_patient_id_fkey(full_name)
-      `)
-      .order('created_at', { ascending: false });
+    // Read local triages created in current session
+    const localRaw = localStorage.getItem('arogya_local_triages');
+    const localTriages: any[] = localRaw ? JSON.parse(localRaw) : [];
+    const formattedLocal: TriageData[] = localTriages.map((t: any) => ({
+      id: t.id,
+      created_at: t.created_at || new Date().toISOString(),
+      symptoms: t.symptoms || '',
+      analysis: t.analysis || '',
+      urgency: t.urgency || 'Medium',
+      department: t.department || 'General Practice',
+      patient: {
+        full_name: t.patient_name || 'Aarav Verma'
+      },
+      doctorName: t.doctorName || 'Dr. Ananya Iyer'
+    }));
 
-    const { data: apptData } = await supabase
-      .from('appointments')
-      .select('*, users!appointments_doctor_id_fkey(full_name)');
+    const defaultShowcaseReports: TriageData[] = [
+      {
+        id: 'triage-demo-1',
+        created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
+        symptoms: 'Persistent dry cough, mild fever (100.4°F), sore throat for 3 days',
+        analysis: 'Clinical presentation indicates acute upper respiratory tract infection. Mild febrile episode without chest pain.',
+        urgency: 'Medium',
+        department: 'General Medicine',
+        patient: { full_name: 'Aarav Verma' },
+        doctorName: 'Dr. Rajesh Mehta'
+      },
+      {
+        id: 'triage-demo-2',
+        created_at: new Date(Date.now() - 3600000 * 72).toISOString(),
+        symptoms: 'Elevated blood pressure reading (145/92 mmHg), occasional palpitations',
+        analysis: 'Stage 1 essential hypertension with episodic palpitations. Recommended 24h ambulatory BP monitor and ECG review.',
+        urgency: 'High',
+        department: 'Cardiology',
+        patient: { full_name: 'Priya Nair' },
+        doctorName: 'Dr. Ananya Iyer'
+      }
+    ];
 
-    if (error) {
-      console.error('Error fetching reports:', error);
-    } else if (data) {
-      const reportsWithDoctors = data.map((triage: any) => {
-        const appt = apptData?.find(a => a.triage_report_id === triage.id);
-        let docName = appt?.users?.full_name || 'Unassigned';
-        docName = docName.replace(/\s*\((Patient|Doctor|Admin|patient|doctor|admin)\)/gi, '');
-        return { ...triage, doctorName: docName };
-      });
-      setReports(reportsWithDoctors as unknown as TriageData[]);
-    }
+    const allCombined = [...formattedLocal, ...(onlineReports.length > 0 ? onlineReports : defaultShowcaseReports)];
+    const uniqueMap = new Map();
+    allCombined.forEach(item => {
+      if (!uniqueMap.has(item.id)) uniqueMap.set(item.id, item);
+    });
+
+    setReports(Array.from(uniqueMap.values()));
     setLoading(false);
   };
 
   const filteredReports = reports.filter(r => {
     const matchUrgency = urgencyFilter === 'All' || r.urgency === urgencyFilter;
     const matchDoctor = doctorFilter === 'All' || r.doctorName === doctorFilter;
-    const matchDisease = (r.analysis?.toLowerCase().includes(diseaseSearch.toLowerCase())) || 
-                         (r.symptoms?.toLowerCase().includes(diseaseSearch.toLowerCase()));
+    const q = diseaseSearch.trim().toLowerCase();
+    const matchDisease = !q ||
+                         (r.analysis?.toLowerCase().includes(q)) || 
+                         (r.symptoms?.toLowerCase().includes(q)) ||
+                         (r.department?.toLowerCase().includes(q)) ||
+                         (r.patient?.full_name?.toLowerCase().includes(q)) ||
+                         (r.id?.toLowerCase().includes(q));
     return matchUrgency && matchDoctor && matchDisease;
   });
 
@@ -243,10 +307,21 @@ export default function AdminReports() {
 
   const handleDelete = async () => {
     if (!deleteId) return;
-    const { error } = await supabase.from('triages').delete().eq('id', deleteId);
-    if (!error) {
-      setReports(prev => prev.filter(r => r.id !== deleteId));
+    try {
+      await supabase.from('triages').delete().eq('id', deleteId);
+    } catch (e) {}
+
+    // Also remove from local storage
+    const localRaw = localStorage.getItem('arogya_local_triages');
+    if (localRaw) {
+      try {
+        const localTriages = JSON.parse(localRaw);
+        const updated = localTriages.filter((t: any) => t.id !== deleteId);
+        localStorage.setItem('arogya_local_triages', JSON.stringify(updated));
+      } catch (e) {}
     }
+
+    setReports(prev => prev.filter(r => r.id !== deleteId));
     setDeleteId(null);
   };
 
