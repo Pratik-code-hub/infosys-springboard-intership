@@ -6,6 +6,6 @@
   "license": "MIT",
   "scripts": {
     "dev": "npm --prefix frontend run dev",
-    "build": "npm --prefix frontend run build"
+    "build": "npm --prefix frontend run build && node copy-dist.cjs"
   }
 }
