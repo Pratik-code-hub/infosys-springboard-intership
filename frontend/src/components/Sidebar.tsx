@@ -23,14 +23,31 @@ export default function Sidebar({ isOpen = false, setIsOpen = (_v: boolean) => {
 
   useEffect(() => {
     async function getUser() {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data } = await supabase.from('users').select('role, full_name').eq('id', session.user.id).single();
-        if (data) {
-          setRole(data.role);
-          let name = data.full_name || session.user.email?.split('@')[0] || 'User';
-          name = name.replace(/Hospital Admin \((.*?)\)/i, '$1').replace(/\s*\((Patient|Doctor|Admin|patient|doctor|admin)\)/gi, '');
-          setUserName(name);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data } = await supabase.from('users').select('role, full_name').eq('id', session.user.id).single();
+          if (data) {
+            setRole(data.role);
+            let name = data.full_name || session.user.email?.split('@')[0] || 'User';
+            name = name.replace(/Hospital Admin \((.*?)\)/i, '$1').replace(/\s*\((Patient|Doctor|Admin|patient|doctor|admin)\)/gi, '');
+            setUserName(name);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn("Supabase session check fallback", e);
+      }
+
+      // Check demo user
+      const demoRaw = localStorage.getItem('arogya_demo_user');
+      if (demoRaw) {
+        try {
+          const demo = JSON.parse(demoRaw);
+          setRole(demo.role);
+          setUserName(demo.name || 'Demo User');
+        } catch (err) {
+          console.error(err);
         }
       }
     }
@@ -38,7 +55,10 @@ export default function Sidebar({ isOpen = false, setIsOpen = (_v: boolean) => {
   }, [location.pathname]);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('arogya_demo_user');
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {}
     navigate('/auth');
   };
 

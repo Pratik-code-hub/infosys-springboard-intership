@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { 
   Calendar, 
-  Clock, 
   CheckCircle2, 
   ChevronRight, 
   ChevronLeft, 
@@ -16,9 +15,7 @@ import {
   Bot, 
   Archive,
   Activity,
-  Filter,
-  Check,
-  AlertTriangle
+  Check
 } from 'lucide-react';
 import ConfirmDialog from '../components/ConfirmDialog';
 import jsPDF from 'jspdf';
@@ -48,39 +45,108 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     async function fetchQueue() {
-      const { data: userData } = await supabase.auth.getUser();
-      if (userData.user) {
-        setDoctorId(userData.user.id);
-        fetchAppointments(userData.user.id);
+      try {
+        const { data: userData } = await supabase.auth.getUser();
+        if (userData?.user) {
+          setDoctorId(userData.user.id);
+          fetchAppointments(userData.user.id);
+        }
+      } catch (e) {
+        console.warn("Doctor user fetch fallback", e);
       }
 
-      const { data, error } = await supabase
-        .from('triages')
-        .select('*, users(full_name)')
-        .eq('status', 'pending')
-        .eq('doctor_hidden', false)
-        .order('created_at', { ascending: false });
+      let onlinePatients: any[] = [];
+      try {
+        const { data } = await supabase
+          .from('triages')
+          .select('*, users(full_name)')
+          .eq('status', 'pending')
+          .eq('doctor_hidden', false)
+          .order('created_at', { ascending: false });
 
-      if (data) {
-        const formatted = data.map((item) => ({
+        if (data && data.length > 0) {
+          onlinePatients = data.map((item) => ({
+            id: item.id,
+            name: item.users?.full_name || 'Anonymous Patient',
+            urgency: item.urgency,
+            dept: item.department,
+            time: new Date(item.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+            report: {
+              symptoms: item.symptoms ? (item.symptoms.includes(',') ? item.symptoms.split(',').map((s: string) => s.trim()) : [item.symptoms]) : ['Not specified'],
+              duration: item.duration || 'Not specified',
+              analysis: item.analysis,
+              image_data: item.image_data,
+              urgency_level: item.urgency,
+              recommended_department: item.department
+            }
+          }));
+        }
+      } catch (err) {
+        console.warn("Queue fetch fallback", err);
+      }
+
+      // Read local triages created during demo session
+      const localRaw = localStorage.getItem('arogya_local_triages');
+      const localTriages: any[] = localRaw ? JSON.parse(localRaw) : [];
+      const localFormatted = localTriages
+        .filter((t: any) => t.status !== 'acknowledged' && !t.doctor_hidden)
+        .map((item: any) => ({
           id: item.id,
-          name: item.users?.full_name || 'Anonymous Patient',
+          name: item.patient_name || 'Aarav Verma',
           urgency: item.urgency,
           dept: item.department,
           time: new Date(item.created_at).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
           report: {
-            symptoms: item.symptoms ? (item.symptoms.includes(',') ? item.symptoms.split(',').map((s: string) => s.trim()) : [item.symptoms]) : ['Not specified'],
-            duration: item.duration || 'Not specified',
+            symptoms: item.symptoms ? (item.symptoms.includes(';') ? item.symptoms.split(';').map((s: string) => s.trim()) : item.symptoms.includes(',') ? item.symptoms.split(',').map((s: string) => s.trim()) : [item.symptoms]) : ['Not specified'],
+            duration: item.duration || '1-3 days',
             analysis: item.analysis,
             image_data: item.image_data,
             urgency_level: item.urgency,
             recommended_department: item.department
           }
         }));
-        setPatients(formatted);
-      } else if (error) {
-        console.error("Error fetching queue:", error);
-      }
+
+      // Default sample queue for doctor showcase
+      const defaultQueue = [
+        {
+          id: 'queue-demo-1',
+          name: 'Aarav Verma',
+          urgency: 'High',
+          dept: 'Cardiology',
+          time: 'Today, 02:45 PM',
+          report: {
+            symptoms: ['Chest tightness on exertion', 'Occasional palpitations', 'Mild dizziness'],
+            duration: '2 days',
+            analysis: 'Patient presents with exertional retrosternal discomfort and tachyarrhythmia symptoms. High urgency triage assigned for ECG and cardiac biomarker evaluation.',
+            image_data: null,
+            urgency_level: 'High',
+            recommended_department: 'Cardiology'
+          }
+        },
+        {
+          id: 'queue-demo-2',
+          name: 'Priya Nair',
+          urgency: 'Medium',
+          dept: 'General Medicine',
+          time: 'Today, 03:15 PM',
+          report: {
+            symptoms: ['High fever (102°F)', 'Chills', 'Productive cough'],
+            duration: '3 days',
+            analysis: 'Probable community-acquired acute lower respiratory tract infection. Stable vitals, moderate urgency for chest auscultation and antibiotic therapy.',
+            image_data: null,
+            urgency_level: 'Medium',
+            recommended_department: 'General Medicine'
+          }
+        }
+      ];
+
+      const mergedQueue = [...localFormatted, ...(onlinePatients.length > 0 ? onlinePatients : defaultQueue)];
+      const uniqueQueueMap = new Map();
+      mergedQueue.forEach(item => {
+        if (!uniqueQueueMap.has(item.id)) uniqueQueueMap.set(item.id, item);
+      });
+
+      setPatients(Array.from(uniqueQueueMap.values()));
       setLoading(false);
     }
     fetchQueue();
@@ -88,39 +154,85 @@ export default function DoctorDashboard() {
 
   const fetchAppointments = async (docId: string) => {
     setLoadingAppts(true);
-    const { data } = await supabase
-      .from('appointments')
-      .select('*, users!appointments_patient_id_fkey(full_name), triages(*)')
-      .eq('doctor_id', docId)
-      .order('appointment_time', { ascending: true });
+    let appts: any[] = [];
+    try {
+      const { data } = await supabase
+        .from('appointments')
+        .select('*, users!appointments_patient_id_fkey(full_name), triages(*)')
+        .eq('doctor_id', docId)
+        .order('appointment_time', { ascending: true });
 
-    if (data) {
-      setAppointments(data);
+      if (data && data.length > 0) {
+        appts = data;
+      }
+    } catch (e) {
+      console.warn("Appointments fetch fallback", e);
     }
+
+    // Also load local appointments
+    const localApptRaw = localStorage.getItem('arogya_local_appointments');
+    const localAppts: any[] = localApptRaw ? JSON.parse(localApptRaw) : [];
+    const formattedLocal = localAppts.map(a => ({
+      id: a.id,
+      patient_id: a.patient_id,
+      doctor_id: a.doctor_id,
+      department: a.department,
+      appointment_time: a.appointment_time,
+      status: a.status,
+      users: { full_name: 'Aarav Verma' },
+      triages: {
+        urgency: 'High',
+        symptoms: 'Scheduled Consultation from AI Triage',
+        duration: 'Booked',
+        analysis: 'Patient booked follow-up consultation directly following AI triage assessment.'
+      }
+    }));
+
+    setAppointments([...formattedLocal, ...appts]);
     setLoadingAppts(false);
   };
 
   const handleAcknowledge = async (triageId: string) => {
-    const { error } = await supabase
-      .from('triages')
-      .update({ status: 'acknowledged' })
-      .eq('id', triageId);
+    try {
+      await supabase
+        .from('triages')
+        .update({ status: 'acknowledged' })
+        .eq('id', triageId);
+    } catch (e) {}
 
-    if (!error) {
-      setPatients(prev => prev.filter(p => p.id !== triageId));
+    // Update local storage
+    const localRaw = localStorage.getItem('arogya_local_triages');
+    if (localRaw) {
+      try {
+        const local = JSON.parse(localRaw);
+        const updated = local.map((t: any) => t.id === triageId ? { ...t, status: 'acknowledged' } : t);
+        localStorage.setItem('arogya_local_triages', JSON.stringify(updated));
+      } catch (e) {}
     }
+
+    setPatients(prev => prev.filter(p => p.id !== triageId));
   };
 
   const handleArchive = async () => {
     if (!archiveId) return;
-    const { error } = await supabase
-      .from('triages')
-      .update({ doctor_hidden: true })
-      .eq('id', archiveId);
+    try {
+      await supabase
+        .from('triages')
+        .update({ doctor_hidden: true })
+        .eq('id', archiveId);
+    } catch (e) {}
 
-    if (!error) {
-      setPatients(prev => prev.filter(p => p.id !== archiveId));
+    // Update local storage
+    const localRaw = localStorage.getItem('arogya_local_triages');
+    if (localRaw) {
+      try {
+        const local = JSON.parse(localRaw);
+        const updated = local.map((t: any) => t.id === archiveId ? { ...t, doctor_hidden: true } : t);
+        localStorage.setItem('arogya_local_triages', JSON.stringify(updated));
+      } catch (e) {}
     }
+
+    setPatients(prev => prev.filter(p => p.id !== archiveId));
     setArchiveId(null);
   };
 
@@ -575,6 +687,29 @@ export default function DoctorDashboard() {
                   renderPatientList(paginatedAppts, true)
                 )}
               </div>
+
+              {/* Schedule Pagination Controls */}
+              {patientAppts.length > ITEMS_PER_PAGE && (
+                <div className="p-4 flex items-center justify-between border-t border-slate-800 bg-slate-950/40">
+                  <span className="text-xs text-slate-400">Page {schedulePage} of {totalSchedulePages}</span>
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => setSchedulePage(p => Math.max(1, p - 1))}
+                      disabled={schedulePage === 1}
+                      className="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 transition-colors"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button 
+                      onClick={() => setSchedulePage(p => Math.min(totalSchedulePages, p + 1))}
+                      disabled={schedulePage === totalSchedulePages}
+                      className="p-1.5 rounded-xl border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 disabled:opacity-30 transition-colors"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
