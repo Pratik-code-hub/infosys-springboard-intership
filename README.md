@@ -1,13 +1,30 @@
 # ArogyaPulse AI 🏥⚡
 > **Next-Generation Multi-Agent Clinical Intelligence & Healthcare Orchestration Platform**  
-> *Engineered by **Pratik Kumar** | Production-Grade Healthcare OS*
+> *Infosys Springboard Internship Project | Engineered by **Pratik Kumar***
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-arogyapulseinfo.vercel.app-brightgreen?style=for-the-badge&logo=vercel)](https://arogyapulseinfo.vercel.app/auth)
+[![Infosys Springboard](https://img.shields.io/badge/Infosys%20Springboard-Internship%202026-007ACC?style=for-the-badge)](https://github.com/Pratik-code-hub/infosys-springboard-intership)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
 [![Framework](https://img.shields.io/badge/React-19-blue.svg)](https://react.dev/)
 [![Backend](https://img.shields.io/badge/FastAPI-0.104+-teal.svg)](https://fastapi.tiangolo.com/)
 [![Agents](https://img.shields.io/badge/LangGraph-StateGraph-orange.svg)](https://langchain-ai.github.io/langgraph/)
-[![Database](https://img.shields.io/badge/Supabase-pgvector%20RAG-emerald.svg)](https://supabase.com/)
-[![AI Engine](https://img.shields.io/badge/LLM-Groq%20%7C%20Google%20Gemini-indigo.svg)](https://groq.com/)
+
+---
+
+## 🌐 Live Production Deployment & Instant Access
+
+- 🚀 **Clickable Live Production Link**: **[https://arogyapulseinfo.vercel.app/auth](https://arogyapulseinfo.vercel.app/auth)**
+- 💻 **Localhost Development Link**: `http://localhost:2004`
+- 📂 **GitHub Repository**: **[Pratik-code-hub/infosys-springboard-intership](https://github.com/Pratik-code-hub/infosys-springboard-intership)**
+- 🌿 **Feature Branch**: `pratik` (Synchronized with `main`)
+
+### ⚡ 1-Click Interactive Demo Profiles (No manual typing required):
+| Role | Profile Name | Purpose & Workflow |
+| :--- | :--- | :--- |
+| **Patient** | **Aarav Verma** (`aarav.verma@gmail.com`) | Enter symptoms/disease, converse with Clinical Intake AI, run 5-agent triage, and book specialist slots |
+| **Attending Doctor** | **Dr. Ananya Iyer** (`dr.ananya@arogyapulse.ai`) | Real-time queue, review clinical dossiers, generate 1-click SOAP notes, and manage consultation schedule |
+| **General Physician**| **Dr. Rajesh Mehta** (`dr.rajesh@arogyapulse.ai`) | Outpatient triage triage review, patient communication, and schedule management |
+| **Superadmin / Director** | **Pratik Kumar** (`pratik.admin@arogyapulse.ai`) | Hospital command center, department volume distribution analytics, and audit registries |
 
 ---
 
@@ -103,8 +120,8 @@ Built with an autonomous **Multi-Agent Architecture using LangGraph**, ArogyaPul
 
 ### Step 1: Clone Repository & Database Setup
 ```bash
-git clone https://github.com/YOUR_GITHUB_USERNAME/ArogyaPulse-AI.git
-cd ArogyaPulse-AI
+git clone https://github.com/Pratik-code-hub/infosys-springboard-intership.git
+cd infosys-springboard-intership
 ```
 
 1. Create a project on [Supabase](https://supabase.com).
@@ -188,7 +205,12 @@ Copyright (c) 2026 **Pratik Kumar**. All rights reserved. See [LICENSE](LICENSE)
 
 ---
 
-## 👨‍💻 Author & Attribution
+## 👨‍💻 Author & Infosys Springboard Attribution
 
-**Engineered and maintained by Pratik Kumar.**  
-Designed as a production-grade multi-agent medical triage platform. Contributions and issues are welcome via GitHub Pull Requests.
+- **Lead Engineer & Architect**: **Pratik Kumar**
+- **Program**: **Infosys Springboard Internship**
+- **Project**: **ArogyaPulse AI** — Next-Gen Multi-Agent Clinical Intelligence & Healthcare OS
+- **Official GitHub**: [https://github.com/Pratik-code-hub/infosys-springboard-intership](https://github.com/Pratik-code-hub/infosys-springboard-intership)
+- **Live Production URL**: [https://arogyapulseinfo.vercel.app/auth](https://arogyapulseinfo.vercel.app/auth)
+- **Development Server**: `http://localhost:2004`
+
